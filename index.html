@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>磁器口非遗文化 - 小程序</title>
+    <style>
+        :root {
+            --primary: #8B3A3A;
+            --primary-dark: #6B2828;
+            --gold: #C9A96E;
+            --gold-light: #E8D5B0;
+            --bg: #FDF6EE;
+            --bg-warm: #FFF8F0;
+            --card: #FFFFFF;
+            --text: #3C2415;
+            --text-light: #7A6455;
+            --text-muted: #A89888;
+            --border: #E8DDD0;
+            --shadow: 0 2px 12px rgba(60, 36, 21, 0.08);
+            --shadow-lg: 0 8px 32px rgba(60, 36, 21, 0.14);
+            --red: #D4453E;
+            --orange: #E8833A;
+            --blue: #5B7FA5;
+            --purple: #8B5E9E;
+            --green: #5A9E6F;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --nav-height: 64px;
+            --header-height: 48px;
+            --safe-bottom: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0e8db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 手机模拟器 */
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            max-height: 95vh;
+            background: #FDF6EE;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 3px #1a1a1a,
+                0 0 0 6px #2d2d2d,
+                0 0 0 8px #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            height: 42px;
+            background: #FDF6EE;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3C2415;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+        .status-bar .time {
+            font-weight: 700;
+        }
+        .status-bar .icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 11px;
+        }
+        .status-icons-svg {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .battery {
+            width: 22px;
+            height: 10px;
+            border: 1.5px solid #3C2415;
+            border-radius: 3px;
+            padding: 1.5px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 5px;
+            background: #3C2415;
+            border-radius: 0 1px 1px 0;
+        }
+        .battery-fill {
+            height: 100%;
+            background: #3C2415;
+            border-radius: 1px;
+            width: 75%;
+        }
+
+        /* 导航头 */
+        .nav-header {
+            height: var(--header-height);
+            background: #FDF6EE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            flex-shrink: 0;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 10;
+        }
+        .nav-header .back-btn {
+            position: absolute;
+            left: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #3C2415;
+            transition: all 0.2s;
+        }
+        .nav-header .back-btn:active {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(0.92);
+        }
+        .nav-header .back-btn.hidden {
+            display: none;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            position: relative;
+            z-index: 1;
+        }
+        .main-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .page {
+            display: none;
+            padding: 0 16px 20px;
+            animation: fadeInUp 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.18);
+                opacity: 0.75;
+            }
+        }
+        @keyframes bounceIn {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+            70% {
+                transform: translateY(4px);
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes ripple {
+            0% {
+                box-shadow: 0 0 0 0 rgba(201, 169, 110, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 0 18px rgba(201, 169, 110, 0);
+            }
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            height: var(--nav-height);
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            padding-bottom: var(--safe-bottom);
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 10px;
+            transition: all 0.25s;
+            position: relative;
+            min-width: 56px;
+        }
+        .nav-item .nav-icon {
+            font-size: 22px;
+            transition: all 0.25s;
+            position: relative;
+        }
+        .nav-item .nav-label {
+            font-size: 11px;
+            color: #A89888;
+            font-weight: 500;
+            transition: all 0.25s;
+        }
+        .nav-item.active .nav-label {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .nav-item.active .nav-icon {
+            transform: translateY(-2px);
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            width: 22px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .nav-item:active {
+            transform: scale(0.9);
+            background: rgba(139, 58, 58, 0.05);
+        }
+
+        /* Toast */
+        .toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(60, 36, 21, 0.9);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 22px;
+            font-size: 14px;
+            font-weight: 600;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 999;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .toast.success {
+            background: rgba(90, 158, 111, 0.92);
+        }
+        .toast.warning {
+            background: rgba(232, 131, 58, 0.92);
+        }
+
+        /* ========== 首页样式 ========== */
+        .home-banner {
+            background: linear-gradient(135deg, #8B3A3A 0%, #6B2828 30%, #5C1F1F 60%, #4A1818 100%);
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            margin-top: 4px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .home-banner::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+        }
+        .home-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 40px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+        }
+        .home-banner .banner-subtitle {
+            font-size: 12px;
+            letter-spacing: 3px;
+            opacity: 0.85;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+        .home-banner .banner-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        .home-banner .banner-desc {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 6px;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+        .home-banner .banner-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.18);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 18px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .route-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1.5px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .route-card:active {
+            transform: scale(0.97);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-lg);
+        }
+        .route-card .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .route-card .route-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+        .route-icon.one-day {
+            background: #FFF0E8;
+        }
+        .route-icon.new-year {
+            background: #FDF0F5;
+        }
+        .route-card .route-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .route-card .route-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.5px;
+        }
+        .route-card .route-brief {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+        .route-card .route-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .route-card .route-tag {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #FDF6EE;
+            color: #8B3A3A;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .route-card .route-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #C9A96E;
+            font-weight: 700;
+        }
+        .route-card .route-badge {
+            position: absolute;
+            top: 12px;
+            right: 40px;
+            background: #D4453E;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== 地图页样式 ========== */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 440px;
+            background: #FBF5EB;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-top: 4px;
+            cursor: default;
+        }
+        .map-bg {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background:
+                radial-gradient(ellipse at 30% 20%, #fdf3e4 0%, #f8ead8 50%, #f0e0cc 100%);
+        }
+        /* 模拟街道 */
+        .map-street {
+            position: absolute;
+            background: #E8D9C5;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .map-street.main {
+            width: 16px;
+            height: 68%;
+            top: 8%;
+            left: 44%;
+            border-radius: 8px;
+            background: #E0D0B8;
+        }
+        .map-street.cross {
+            width: 55%;
+            height: 14px;
+            top: 42%;
+            left: 20%;
+            border-radius: 7px;
+            background: #E0D0B8;
+        }
+        .map-street.river {
+            width: 90%;
+            height: 6px;
+            bottom: 8%;
+            left: 5%;
+            border-radius: 3px;
+            background: #C8D8E8;
+            box-shadow: 0 0 8px rgba(150, 180, 210, 0.3);
+        }
+        .map-label-river {
+            position: absolute;
+            bottom: 12%;
+            right: 8%;
+            font-size: 9px;
+            color: #8899AA;
+            letter-spacing: 1px;
+        }
+        .map-label-street {
+            position: absolute;
+            font-size: 9px;
+            color: #B8A088;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* 地图标记点 */
+        .map-marker {
+            position: absolute;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .map-marker:active {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+        .map-marker .marker-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .map-marker .marker-dot.workshop {
+            background: #FFF0E0;
+            border: 3px solid #E8833A;
+        }
+        .map-marker .marker-dot.shop {
+            background: #F0F4F8;
+            border: 3px solid #5B7FA5;
+        }
+        .map-marker .marker-dot.studio {
+            background: #F8F0FA;
+            border: 3px solid #8B5E9E;
+        }
+        .map-marker .marker-label {
+            font-size: 10px;
+            color: #3C2415;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .map-marker.pulse .marker-dot {
+            animation: pulse 2s infinite;
+        }
+        .map-legend {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding: 0 4px;
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        .map-legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .legend-dot.w {
+            background: #E8833A;
+        }
+        .legend-dot.s {
+            background: #5B7FA5;
+        }
+        .legend-dot.st {
+            background: #8B5E9E;
+        }
+
+        /* 弹出卡片 */
+        .popup-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 50;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            border-radius: 32px;
+            overflow: hidden;
+        }
+        .popup-overlay.show {
+            display: flex;
+        }
+        .popup-card {
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-height: 55%;
+            padding: 20px 18px 28px;
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.2);
+            animation: bounceIn 0.4s ease;
+            overflow-y: auto;
+            position: relative;
+        }
+        .popup-card .popup-handle {
+            width: 36px;
+            height: 4px;
+            background: #D0C8BC;
+            border-radius: 2px;
+            margin: 0 auto 14px;
+        }
+        .popup-card .popup-type {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .popup-card .popup-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 4px 0 8px;
+        }
+        .popup-card .popup-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        .popup-card .popup-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn:active {
+            transform: scale(0.93);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(139, 58, 58, 0.3);
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-gold {
+            background: var(--gold);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(201, 169, 110, 0.35);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 11px;
+            border-radius: 14px;
+        }
+        .popup-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f5f0ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #999;
+            transition: all 0.2s;
+            z-index: 5;
+        }
+        .popup-close:active {
+            background: #e0d8cc;
+            transform: scale(0.9);
+        }
+
+        /* ========== 拼团页样式 ========== */
+        .group-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--gold);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .group-card.urgent {
+            border-left-color: #D4453E;
+        }
+        .group-card .group-date {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .group-card .group-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 4px 0;
+        }
+        .group-card .group-info {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .group-card .group-price {
+            font-size: 22px;
+            font-weight: 800;
+            color: #D4453E;
+        }
+        .group-card .group-price span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .group-card .group-remain {
+            font-size: 12px;
+            color: #E8833A;
+            font-weight: 600;
+            background: #FFF5ED;
+            padding: 4px 10px;
+            border-radius: 10px;
+        }
+        .group-card .group-remain.full {
+            color: #5A9E6F;
+            background: #F0F8F2;
+        }
+        .group-card .btn-sign {
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            padding: 8px 16px;
+            border-radius: 18px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            box-shadow: 0 3px 10px rgba(139, 58, 58, 0.25);
+        }
+        .group-card .btn-sign:active {
+            transform: scale(0.9);
+            box-shadow: 0 1px 4px rgba(139, 58, 58, 0.3);
+        }
+        .group-card .btn-sign.signed {
+            background: #ccc;
+            cursor: default;
+            box-shadow: none;
+        }
+        .group-card .btn-sign.signed:active {
+            transform: none;
+        }
+        .group-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 6px 0 14px;
+            flex-wrap: wrap;
+        }
+        .group-tab {
+            padding: 7px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.25s;
+            background: #f5f0ea;
+            color: #7A6455;
+            border: none;
+            letter-spacing: 0.5px;
+        }
+        .group-tab.active {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+        }
+        .group-tab:active {
+            transform: scale(0.93);
+        }
+
+        /* ========== 我的页面样式 ========== */
+        .my-header {
+            background: linear-gradient(135deg, #8B3A3A, #5C1F1F);
+            border-radius: var(--radius);
+            padding: 22px 18px;
+            color: #fff;
+            margin-top: 4px;
+            box-shadow: var(--shadow-lg);
+        }
+        .my-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .my-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .my-id {
+            font-size: 11px;
+            opacity: 0.7;
+            letter-spacing: 0.5px;
+        }
+        .my-menu-card {
+            background: #fff;
+            border-radius: var(--radius);
+            margin-top: 14px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .my-menu-item {
+            padding: 15px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f5f0ea;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        .my-menu-item:last-child {
+            border-bottom: none;
+        }
+        .my-menu-item:active {
+            background: #fdf8f2;
+        }
+        .my-menu-item .menu-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .menu-icon.checkin {
+            background: #FFF5ED;
+        }
+        .menu-icon.group {
+            background: #F5F8FC;
+        }
+        .menu-icon.fav {
+            background: #FDF5F8;
+        }
+        .my-menu-item .menu-arrow {
+            margin-left: auto;
+            color: #ccc;
+            font-size: 16px;
+        }
+        .my-menu-item .menu-badge {
+            margin-left: auto;
+            margin-right: 6px;
+            background: #D4453E;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #B8A088;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 弹窗 - 线路详情 */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 60;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            border-radius: 32px;
+            overflow: hidden;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-dialog {
+            background: #fff;
+            border-radius: 18px;
+            width: 88%;
+            max-height: 70%;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            animation: fadeInUp 0.3s ease;
+            position: relative;
+        }
+        .modal-dialog h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .modal-dialog .modal-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .modal-dialog .stop-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f0ea;
+            font-size: 13px;
+            color: var(--text);
+        }
+        .modal-dialog .stop-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f5f0ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            z-index: 5;
+            transition: all 0.2s;
+        }
+        .modal-close:active {
+            background: #ddd;
+            transform: scale(0.9);
+        }
+
+        /* 响应式 */
+        @media (max-width: 430px) {
+            .phone-frame {
+                width: 100vw;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .popup-overlay,
+            .modal-overlay {
+                border-radius: 0;
+            }
+            body {
+                padding: 0;
+            }
+            .map-container {
+                height: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame" id="app">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span class="time">9:41</span>
+            <span class="icons">
+                <span class="status-icons-svg">📶</span>
+                <span class="status-icons-svg">📡</span>
+                <span class="battery"><span class="battery-fill"></span></span>
+            </span>
+        </div>
+
+        <!-- 导航头 -->
+        <div class="nav-header" id="navHeader">
+            <span id="headerTitle">磁器口·非遗</span>
+            <span class="back-btn hidden" id="backBtn" title="返回">←</span>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+
+        <!-- 主内容 -->
+        <div class="main-content" id="mainContent">
+
+            <!-- ==================== 首页 ==================== -->
+            <div class="page active" id="page-home">
+                <div class="home-banner">
+                    <div class="banner-subtitle">🏮 重庆·磁器口古镇</div>
+                    <div class="banner-title">非遗文化体验</div>
+                    <div class="banner-desc">探寻千年古镇，感受巴渝非遗魅力<br>打卡手工艺坊，体验传统技艺</div>
+                    <span class="banner-tag">🔖 国家级非遗</span>
+                </div>
+
+                <div class="section-title">推荐打卡线路</div>
+
+                <div class="route-card" onclick="openRouteDetail('oneday')">
+                    <div class="route-header">
+                        <div class="route-icon one-day">🗺️</div>
+                        <div class="route-info">
+                            <div class="route-name">非遗一日深度游</div>
+                            <div class="route-brief">涵盖6个核心非遗点位，从年画到蜀绣，从麻花到川剧，一站式体验巴渝文化精髓</div>
+                            <div class="route-tags">
+                                <span class="route-tag">梁平年画</span>
+                                <span class="route-tag">蜀绣</span>
+                                <span class="route-tag">陈麻花</span>
+                                <span class="route-tag">川剧脸谱</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="route-badge">🔥 热门</span>
+                    <span class="route-arrow">›</span>
+                </div>
+
+                <div class="route-card" onclick="openRouteDetail('newyear')">
+                    <div class="route-header">
+                        <div class="route-icon new-year">🎨</div>
+                        <div class="route-info">
+                            <div class="route-name">年画之旅</div>
+                            <div class="route-brief">专注梁平木版年画体验，从雕刻到印刷，亲手制作一幅属于自己的年画作品</div>
+                            <div class="route-tags">
+                                <span class="route-tag">年画工坊</span>
+                                <span class="route-tag">木版雕刻</span>
+                                <span class="route-tag">手工印刷</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="route-arrow">›</span>
+                </div>
+
+                <div class="section-title">热门点位</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <span style="background:#fff;padding:8px 14px;border-radius:16px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:pointer;transition:all 0.2s;" onclick="switchTab('map');highlightMarker('m1')">🏭 梁平年画工坊</span>
+                    <span style="background:#fff;padding:8px 14px;border-radius:16px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:pointer;transition:all 0.2s;" onclick="switchTab('map');highlightMarker('m2')">🛍️ 陈麻花体验店</span>
+                    <span style="background:#fff;padding:8px 14px;border-radius:16px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:pointer;transition:all 0.2s;" onclick="switchTab('map');highlightMarker('m3')">🎨 蜀绣工作室</span>
+                    <span style="background:#fff;padding:8px 14px;border-radius:16px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:pointer;transition:all 0.2s;" onclick="switchTab('map');highlightMarker('m5')">🍬 糖画摊</span>
+                </div>
+            </div>
+
+            <!-- ==================== 地图页 ==================== -->
+            <div class="page" id="page-map">
+                <div class="map-container" id="mapContainer">
+                    <div class="map-bg">
+                        <!-- 模拟街道 -->
+                        <div class="map-street main"></div>
+                        <div class="map-street cross"></div>
+                        <div class="map-street river"></div>
+                        <span class="map-label-river">嘉陵江 →</span>
+                        <span class="map-label-street" style="top:6%;left:31%;">正街</span>
+                        <span class="map-label-street" style="top:39%;left:18%;">横街</span>
+
+                        <!-- 标记点 -->
+                        <div class="map-marker pulse" id="m1" style="top:12%;left:38%;" onclick="openMarkerPopup('m1')" data-type="workshop" data-name="梁平年画工坊" data-desc="国家级非遗梁平木版年画体验工坊，可亲手雕刻木版、印制年画，感受三百年传承技艺。">
+                            <div class="marker-dot workshop">🏭</div>
+                            <span class="marker-label">年画工坊</span>
+                        </div>
+                        <div class="map-marker" id="m2" style="top:22%;left:48%;" onclick="openMarkerPopup('m2')" data-type="shop" data-name="陈麻花体验店" data-desc="磁器口标志性美食，陈麻花传统制作技艺展示，可现场观看并品尝新鲜出炉的麻花。">
+                            <div class="marker-dot shop">🛍️</div>
+                            <span class="marker-label">陈麻花店</span>
+                        </div>
+                        <div class="map-marker pulse" id="m3" style="top:30%;left:40%;" onclick="openMarkerPopup('m3')" data-type="studio" data-name="蜀绣工作室" data-desc="蜀绣非遗传承人工作室，展示精美蜀绣作品，提供体验课程，一针一线绣出巴渝风情。">
+                            <div class="marker-dot studio">🎨</div>
+                            <span class="marker-label">蜀绣工作室</span>
+                        </div>
+                        <div class="map-marker" id="m4" style="top:38%;left:22%;" onclick="openMarkerPopup('m4')" data-type="workshop" data-name="剪纸艺术馆" data-desc="磁器口传统剪纸艺术，图案多取材于巴渝民俗，可体验剪纸乐趣，带走专属作品。">
+                            <div class="marker-dot workshop">✂️</div>
+                            <span class="marker-label">剪纸馆</span>
+                        </div>
+                        <div class="map-marker" id="m5" style="top:40%;left:60%;" onclick="openMarkerPopup('m5')" data-type="shop" data-name="糖画摊" data-desc="传统糖画技艺，以糖为墨、以勺为笔，在石板上勾勒出栩栩如生的图案，甜蜜的非遗体验。">
+                            <div class="marker-dot shop">🍬</div>
+                            <span class="marker-label">糖画摊</span>
+                        </div>
+                        <div class="map-marker" id="m6" style="top:48%;left:28%;" onclick="openMarkerPopup('m6')" data-type="workshop" data-name="手工糍粑坊" data-desc="传统手工糍粑制作，木槌石臼，体验打糍粑的乐趣，品尝糯香四溢的巴渝风味。">
+                            <div class="marker-dot workshop">🔨</div>
+                            <span class="marker-label">糍粑坊</span>
+                        </div>
+                        <div class="map-marker pulse" id="m7" style="top:52%;left:52%;" onclick="openMarkerPopup('m7')" data-type="studio" data-name="川剧脸谱工作室" data-desc="川剧变脸脸谱绘制体验，了解脸谱色彩背后的文化含义，亲手绘制专属脸谱面具。">
+                            <div class="marker-dot studio">🎭</div>
+                            <span class="marker-label">脸谱工作室</span>
+                        </div>
+                        <div class="map-marker" id="m8" style="top:58%;left:42%;" onclick="openMarkerPopup('m8')" data-type="shop" data-name="磁器口老茶馆" data-desc="百年老茶馆，品盖碗茶、听川剧座唱，感受老重庆的悠闲与韵味，非遗曲艺活态传承。">
+                            <div class="marker-dot shop">🍵</div>
+                            <span class="marker-label">老茶馆</span>
+                        </div>
+                    </div>
+
+                    <!-- 弹出卡片 -->
+                    <div class="popup-overlay" id="popupOverlay" onclick="closeMarkerPopup(event)">
+                        <div class="popup-card" id="popupCard" onclick="event.stopPropagation()">
+                            <span class="popup-close" onclick="closeMarkerPopup()">✕</span>
+                            <div class="popup-handle"></div>
+                            <div class="popup-type" id="popupType">工坊</div>
+                            <div class="popup-name" id="popupName">点位名称</div>
+                            <div class="popup-desc" id="popupDesc">点位描述</div>
+                            <div class="popup-actions">
+                                <button class="btn btn-primary btn-sm" onclick="checkIn()">📍 打卡</button>
+                                <button class="btn btn-outline btn-sm" onclick="toggleFav()">❤️ <span id="favBtnText">收藏</span></button>
+                                <button class="btn btn-gold btn-sm" onclick="viewGroupBuy()">👥 查看拼团</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-legend">
+                    <span><span class="legend-dot w"></span> 工坊</span>
+                    <span><span class="legend-dot s"></span> 小店</span>
+                    <span><span class="legend-dot st"></span> 工作室</span>
+                    <span style="margin-left:auto;color:#E8833A;">💡 点击图标查看详情</span>
+                </div>
+            </div>
+
+            <!-- ==================== 拼团页 ==================== -->
+            <div class="page" id="page-group">
+                <div class="group-tabs" id="groupTabs">
+                    <button class="group-tab active" onclick="filterGroups('all')">全部拼团</button>
+                    <button class="group-tab" onclick="filterGroups('oneday')">非遗一日游</button>
+                    <button class="group-tab" onclick="filterGroups('newyear')">年画之旅</button>
+                </div>
+                <div id="groupList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+
+            <!-- ==================== 我的页面 ==================== -->
+            <div class="page" id="page-mine">
+                <div class="my-header">
+                    <div class="my-avatar">🧑‍🎨</div>
+                    <div class="my-name">非遗爱好者</div>
+                    <div class="my-id">ID: CQK2024</div>
+                </div>
+                <div class="my-menu-card">
+                    <div class="my-menu-item" onclick="showMyCheckins()">
+                        <span class="menu-icon checkin">📍</span>
+                        <span>打卡记录</span>
+                        <span class="menu-badge" id="checkinCount">0</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="my-menu-item" onclick="showMyGroups()">
+                        <span class="menu-icon group">👥</span>
+                        <span>发起的拼团</span>
+                        <span class="menu-badge" id="myGroupCount" style="background:#5B7FA5;">0</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="my-menu-item" onclick="showMyFavorites()">
+                        <span class="menu-icon fav">❤️</span>
+                        <span>收藏点位</span>
+                        <span class="menu-badge" id="favCount" style="background:#8B5E9E;">0</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+                <div class="my-menu-card" style="margin-top:10px;">
+                    <div class="my-menu-item" onclick="showToast('关于磁器口非遗小程序 v1.0', '')">
+                        <span class="menu-icon" style="background:#f5f5f5;">ℹ️</span>
+                        <span>关于小程序</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav" id="bottomNav">
+            <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </div>
+            <div class="nav-item" data-tab="map" onclick="switchTab('map')">
+                <span class="nav-icon">🗺️</span>
+                <span class="nav-label">地图</span>
+            </div>
+            <div class="nav-item" data-tab="group" onclick="switchTab('group')">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">拼团</span>
+            </div>
+            <div class="nav-item" data-tab="mine" onclick="switchTab('mine')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">我的</span>
+            </div>
+        </div>
+
+        <!-- 线路详情弹窗 -->
+        <div class="modal-overlay" id="routeModal" onclick="closeRouteDetail(event)">
+            <div class="modal-dialog" id="routeModalDialog" onclick="event.stopPropagation()">
+                <span class="modal-close" onclick="closeRouteDetail()">✕</span>
+                <div id="routeModalContent"></div>
+            </div>
+        </div>
+
+        <!-- 我的打卡/收藏/拼团详情弹窗 -->
+        <div class="modal-overlay" id="myDetailModal" onclick="closeMyDetailModal(event)">
+            <div class="modal-dialog" id="myDetailDialog" onclick="event.stopPropagation()">
+                <span class="modal-close" onclick="closeMyDetailModal()">✕</span>
+                <div id="myDetailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据存储 ====================
+        const appData = {
+            checkins: [], // 打卡记录 [{id, name, time}]
+            favorites: [], // 收藏点位 [{id, name, type}]
+            myGroups: [], // 发起的拼团
+            signedGroups: [], // 已报名的拼团ID
+        };
+
+        // 从localStorage加载
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('ciqikou_app_data');
+                if (saved) {
+                    const d = JSON.parse(saved);
+                    appData.checkins = d.checkins || [];
+                    appData.favorites = d.favorites || [];
+                    appData.myGroups = d.myGroups || [];
+                    appData.signedGroups = d.signedGroups || [];
+                }
+            } catch (e) {}
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('ciqikou_app_data', JSON.stringify(appData));
+            } catch (e) {}
+        }
+        loadData();
+
+        // ==================== 点位数据 ====================
+        const markerData = {
+            m1: { id: 'm1', name: '梁平年画工坊', type: '工坊', typeClass: 'workshop', desc: '国家级非遗梁平木版年画体验工坊，可亲手雕刻木版、印制年画，感受三百年传承技艺。开放时间：9:00-17:00，体验价¥68/人。' },
+            m2: { id: 'm2', name: '陈麻花体验店', type: '小店', typeClass: 'shop', desc: '磁器口标志性美食，陈麻花传统制作技艺展示，可现场观看并品尝新鲜出炉的麻花。多种口味可选，伴手礼首选。' },
+            m3: { id: 'm3', name: '蜀绣工作室', type: '工作室', typeClass: 'studio', desc: '蜀绣非遗传承人工作室，展示精美蜀绣作品，提供体验课程，一针一线绣出巴渝风情。体验课¥128/人。' },
+            m4: { id: 'm4', name: '剪纸艺术馆', type: '工坊', typeClass: 'workshop', desc: '磁器口传统剪纸艺术，图案多取材于巴渝民俗，可体验剪纸乐趣，带走专属作品。体验价¥38/人。' },
+            m5: { id: 'm5', name: '糖画摊', type: '小店', typeClass: 'shop', desc: '传统糖画技艺，以糖为墨、以勺为笔，在石板上勾勒出栩栩如生的图案，甜蜜的非遗体验。¥15-30/个。' },
+            m6: { id: 'm6', name: '手工糍粑坊', type: '工坊', typeClass: 'workshop', desc: '传统手工糍粑制作，木槌石臼，体验打糍粑的乐趣，品尝糯香四溢的巴渝风味。体验价¥48/人。' },
+            m7: { id: 'm7', name: '川剧脸谱工作室', type: '工作室', typeClass: 'studio', desc: '川剧变脸脸谱绘制体验，了解脸谱色彩背后的文化含义，亲手绘制专属脸谱面具。体验价¥88/人。' },
+            m8: { id: 'm8', name: '磁器口老茶馆', type: '小店', typeClass: 'shop', desc: '百年老茶馆，品盖碗茶、听川剧座唱，感受老重庆的悠闲与韵味，非遗曲艺活态传承。盖碗茶¥28/位。' },
+        };
+
+        // ==================== 拼团数据 ====================
+        const groupBuyData = [
+            { id: 'g1', title: '非遗一日深度游', category: 'oneday', date: '2026-06-15（周一）', price: 198, originalPrice: 268, remain: 6, total: 20,
+                desc: '含6个非遗点位门票+体验+午餐', urgent: false },
+            { id: 'g2', title: '非遗一日深度游', category: 'oneday', date: '2026-06-20（周六）', price: 198, originalPrice: 268, remain: 3, total: 20,
+                desc: '含6个非遗点位门票+体验+午餐', urgent: true },
+            { id: 'g3', title: '年画体验之旅', category: 'newyear', date: '2026-06-14（周日）', price: 128, originalPrice: 188, remain: 8, total: 15,
+                desc: '专注年画工坊深度体验+木版雕刻', urgent: false },
+            { id: 'g4', title: '年画体验之旅', category: 'newyear', date: '2026-06-21（周日）', price: 128, originalPrice: 188, remain: 2, total: 15,
+                desc: '专注年画工坊深度体验+木版雕刻', urgent: true },
+            { id: 'g5', title: '古镇美食非遗团', category: 'oneday', date: '2026-06-18（周四）', price: 158, originalPrice: 228, remain: 10,
+                total: 25, desc: '麻花+糍粑+糖画+老茶馆，美食之旅', urgent: false },
+            { id: 'g6', title: '手工艺体验团', category: 'newyear', date: '2026-06-22（周一）', price: 168, originalPrice: 238, remain: 5,
+                total: 18, desc: '年画+剪纸+蜀绣+脸谱，手工盛宴', urgent: false },
+        ];
+
+        // ==================== 当前状态 ====================
+        let currentTab = 'home';
+        let currentPopupMarker = null;
+        let currentGroupFilter = 'all';
+
+        // ==================== Toast ====================
+        function showToast(msg, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.className = 'toast';
+            }, 1800);
+        }
+
+        // ==================== 页面切换 ====================
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const pageMap = { home: 'page-home', map: 'page-map', group: 'page-group', mine: 'page-mine' };
+            const pageEl = document.getElementById(pageMap[tab]);
+            if (pageEl) pageEl.classList.add('active');
+
+            const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+            if (navItem) navItem.classList.add('active');
+
+            // 更新标题
+            const titles = { home: '磁器口·非遗', map: '非遗地图', group: '拼团出游', mine: '我的' };
+            document.getElementById('headerTitle').textContent = titles[tab] || '磁器口·非遗';
+            document.getElementById('backBtn').classList.add('hidden');
+
+            // 关闭弹窗
+            closeMarkerPopup();
+            closeRouteDetail();
+            closeMyDetailModal();
+            document.getElementById('popupOverlay').classList.remove('show');
+
+            // 刷新拼团列表
+            if (tab === 'group') renderGroupList();
+            if (tab === 'mine') updateMyBadges();
+
+            // 滚动到顶部
+            document.getElementById('mainContent').scrollTop = 0;
+        }
+
+        // ==================== 地图标记弹窗 ====================
+        function openMarkerPopup(markerId) {
+            const data = markerData[markerId];
+            if (!data) return;
+            currentPopupMarker = markerId;
+            document.getElementById('popupType').textContent = data.type;
+            document.getElementById('popupName').textContent = data.name;
+            document.getElementById('popupDesc').textContent = data.desc;
+            document.getElementById('popupOverlay').classList.add('show');
+
+            // 更新收藏按钮
+            const isFaved = appData.favorites.some(f => f.id === markerId);
+            document.getElementById('favBtnText').textContent = isFaved ? '已收藏' : '收藏';
+        }
+
+        function closeMarkerPopup(event) {
+            if (event && event.target !== document.getElementById('popupOverlay')) return;
+            document.getElementById('popupOverlay').classList.remove('show');
+            currentPopupMarker = null;
+        }
+
+        function highlightMarker(markerId) {
+            switchTab('map');
+            setTimeout(() => {
+                openMarkerPopup(markerId);
+                const marker = document.getElementById(markerId);
+                if (marker) {
+                    marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    marker.style.transform = 'scale(1.35)';
+                    marker.style.zIndex = '15';
+                    setTimeout(() => {
+                        marker.style.transform = '';
+                        marker.style.zIndex = '';
+                    }, 800);
+                }
+            }, 400);
+        }
+
+        // ==================== 打卡 ====================
+        function checkIn() {
+            if (!currentPopupMarker) return;
+            const data = markerData[currentPopupMarker];
+            const exists = appData.checkins.find(c => c.id === currentPopupMarker);
+            if (exists) {
+                showToast('该点位已打卡过啦~ 📍', 'warning');
+                return;
+            }
+            appData.checkins.push({
+                id: currentPopupMarker,
+                name: data.name,
+                type: data.type,
+                time: new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit',
+                    minute: '2-digit' }),
+            });
+            saveData();
+            updateMyBadges();
+            showToast('打卡成功！📍 ' + data.name, 'success');
+        }
+
+        // ==================== 收藏 ====================
+        function toggleFav() {
+            if (!currentPopupMarker) return;
+            const data = markerData[currentPopupMarker];
+            const idx = appData.favorites.findIndex(f => f.id === currentPopupMarker);
+            if (idx >= 0) {
+                appData.favorites.splice(idx, 1);
+                document.getElementById('favBtnText').textContent = '收藏';
+                showToast('已取消收藏', '');
+            } else {
+                appData.favorites.push({ id: currentPopupMarker, name: data.name, type: data.type });
+                document.getElementById('favBtnText').textContent = '已收藏';
+                showToast('已收藏 ❤️ ' + data.name, 'success');
+            }
+            saveData();
+            updateMyBadges();
+        }
+
+        // ==================== 查看拼团 ====================
+        function viewGroupBuy() {
+            closeMarkerPopup();
+            switchTab('group');
+            if (currentPopupMarker && markerData[currentPopupMarker]) {
+                const name = markerData[currentPopupMarker].name;
+                if (name.includes('年画')) {
+                    filterGroups('newyear');
+                } else {
+                    filterGroups('all');
+                }
+                showToast('查看「' + name + '」相关拼团', '');
+            }
+        }
+
+        // ==================== 拼团列表渲染 ====================
+        function renderGroupList() {
+            const container = document.getElementById('groupList');
+            let data = groupBuyData;
+            if (currentGroupFilter !== 'all') {
+                data = groupBuyData.filter(g => g.category === currentGroupFilter);
+            }
+            container.innerHTML = data.map(g => {
+                const signed = appData.signedGroups.includes(g.id);
+                const remainClass = g.remain <= 3 ? '' : 'full';
+                const cardClass = g.urgent ? 'urgent' : '';
+                return `
+                <div class="group-card ${cardClass}">
+                    <div class="group-date">📅 ${g.date}</div>
+                    <div class="group-title">${g.title}</div>
+                    <div style="font-size:12px;color:#7A6455;margin:2px 0;">${g.desc}</div>
+                    <div class="group-info">
+                        <span class="group-price">¥${g.price} <span>起</span></span>
+                        <span style="font-size:11px;color:#A89888;text-decoration:line-through;">¥${g.originalPrice}</span>
+                        <span class="group-remain ${remainClass}">剩余 ${g.remain}/${g.total} 名额</span>
+                    </div>
+                    <button class="btn-sign ${signed ? 'signed' : ''}" 
+                            onclick="${signed ? '' : `signGroup('${g.id}')`}" 
+                            ${signed ? 'disabled' : ''}>
+                        ${signed ? '已报名 ✓' : '一键报名'}
+                    </button>
+                </div>`;
+            }).join('');
+
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无拼团信息，请稍后再看~</div>';
+            }
+        }
+
+        function filterGroups(cat) {
+            currentGroupFilter = cat;
+            document.querySelectorAll('#groupTabs .group-tab').forEach(t => t.classList.remove('active'));
+            const tabBtns = document.querySelectorAll('#groupTabs .group-tab');
+            const idx = cat === 'all' ? 0 : (cat === 'oneday' ? 1 : 2);
+            if (tabBtns[idx]) tabBtns[idx].classList.add('active');
+            renderGroupList();
+        }
+
+        function signGroup(groupId) {
+            if (appData.signedGroups.includes(groupId)) {
+                showToast('您已报名该拼团~', 'warning');
+                return;
+            }
+            const group = groupBuyData.find(g => g.id === groupId);
+            if (!group) return;
+            if (group.remain <= 0) {
+                showToast('名额已满，请选择其他日期', 'warning');
+                return;
+            }
+            appData.signedGroups.push(groupId);
+            group.remain = Math.max(0, group.remain - 1);
+            // 同时添加到"发起的拼团"（模拟用户参与）
+            if (!appData.myGroups.find(mg => mg.id === groupId)) {
+                appData.myGroups.push({
+                    id: groupId,
+                    title: group.title,
+                    date: group.date,
+                    price: group.price,
+                    time: new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric' }),
+                });
+            }
+            saveData();
+            renderGroupList();
+            updateMyBadges();
+            showToast('报名成功！🎉 ' + group.title, 'success');
+        }
+
+        // ==================== 更新我的页面徽章 ====================
+        function updateMyBadges() {
+            document.getElementById('checkinCount').textContent = appData.checkins.length;
+            document.getElementById('myGroupCount').textContent = appData.myGroups.length;
+            document.getElementById('favCount').textContent = appData.favorites.length;
+        }
+
+        // ==================== 我的详情弹窗 ====================
+        function showMyCheckins() {
+            const content = document.getElementById('myDetailContent');
+            if (appData.checkins.length === 0) {
+                content.innerHTML =
+                    '<h3>📍 打卡记录</h3><div class="empty-state">还没有打卡记录，去地图页探索非遗点位吧~</div>';
+            } else {
+                content.innerHTML = '<h3>📍 打卡记录</h3>' + appData.checkins.map((c, i) =>
+                    `<div class="stop-item"><span class="stop-num">${i+1}</span><span>${c.name}</span><span style="margin-left:auto;font-size:11px;color:#A89888;">${c.time}</span></div>`
+                ).join('');
+            }
+            document.getElementById('myDetailModal').classList.add('show');
+        }
+
+        function showMyGroups() {
+            const content = document.getElementById('myDetailContent');
+            if (appData.myGroups.length === 0) {
+                content.innerHTML =
+                    '<h3>👥 发起的拼团</h3><div class="empty-state">还没有发起的拼团，去拼团页报名或发起吧~</div>';
+            } else {
+                content.innerHTML = '<h3>👥 发起的拼团</h3>' + appData.myGroups.map((g, i) =>
+                    `<div class="stop-item"><span class="stop-num">${i+1}</span><span>${g.title}</span><span style="margin-left:auto;font-size:11px;color:#A89888;">${g.date || g.time}</span><span style="font-size:12px;color:#D4453E;font-weight:600;margin-left:8px;">¥${g.price}</span></div>`
+                ).join('');
+            }
+            document.getElementById('myDetailModal').classList.add('show');
+        }
+
+        function showMyFavorites() {
+            const content = document.getElementById('myDetailContent');
+            if (appData.favorites.length === 0) {
+                content.innerHTML = '<h3>❤️ 收藏点位</h3><div class="empty-state">还没有收藏点位，去地图页探索吧~</div>';
+            } else {
+                content.innerHTML = '<h3>❤️ 收藏点位</h3>' + appData.favorites.map((f, i) =>
+                    `<div class="stop-item"><span class="stop-num">${i+1}</span><span>${f.name}</span><span style="margin-left:auto;font-size:11px;color:#A89888;">${f.type}</span><button class="btn btn-sm btn-outline" style="margin-left:8px;" onclick="goToMarker('${f.id}')">查看</button></div>`
+                ).join('');
+            }
+            document.getElementById('myDetailModal').classList.add('show');
+        }
+
+        function goToMarker(markerId) {
+            closeMyDetailModal();
+            highlightMarker(markerId);
+        }
+
+        function closeMyDetailModal(event) {
+            if (event && event.target !== document.getElementById('myDetailModal')) return;
+            document.getElementById('myDetailModal').classList.remove('show');
+        }
+
+        // ==================== 线路详情弹窗 ====================
+        function openRouteDetail(type) {
+            const content = document.getElementById('routeModalContent');
+            if (type === 'oneday') {
+                content.innerHTML = `
+                <h3>🗺️ 非遗一日深度游</h3>
+                <div class="modal-subtitle">推荐时长：全天（约6-7小时）| 建议9:00开始</div>
+                <div class="stop-item"><span class="stop-num">1</span><span>梁平年画工坊</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约60分钟</span></div>
+                <div class="stop-item"><span class="stop-num">2</span><span>陈麻花体验店</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约30分钟</span></div>
+                <div class="stop-item"><span class="stop-num">3</span><span>蜀绣工作室</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约50分钟</span></div>
+                <div class="stop-item"><span class="stop-num">4</span><span>手工糍粑坊</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约40分钟</span></div>
+                <div class="stop-item"><span class="stop-num">5</span><span>川剧脸谱工作室</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约50分钟</span></div>
+                <div class="stop-item"><span class="stop-num">6</span><span>磁器口老茶馆</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约40分钟</span></div>
+                <div style="margin-top:12px;text-align:center;">
+                    <button class="btn btn-primary" onclick="closeRouteDetail();switchTab('group');filterGroups('oneday');">👥 查看相关拼团</button>
+                </div>`;
+            } else {
+                content.innerHTML = `
+                <h3>🎨 年画之旅</h3>
+                <div class="modal-subtitle">推荐时长：半天（约3-4小时）| 建议9:00或14:00开始</div>
+                <div class="stop-item"><span class="stop-num">1</span><span>梁平年画工坊 - 参观讲解</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约40分钟</span></div>
+                <div class="stop-item"><span class="stop-num">2</span><span>木版雕刻体验</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约60分钟</span></div>
+                <div class="stop-item"><span class="stop-num">3</span><span>手工印刷体验</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约50分钟</span></div>
+                <div class="stop-item"><span class="stop-num">4</span><span>剪纸艺术馆（年画主题剪纸）</span><span style="margin-left:auto;font-size:11px;color:#A89888;">约40分钟</span></div>
+                <div style="margin-top:12px;text-align:center;">
+                    <button class="btn btn-primary" onclick="closeRouteDetail();switchTab('group');filterGroups('newyear');">👥 查看相关拼团</button>
+                </div>`;
+            }
+            document.getElementById('routeModal').classList.add('show');
+        }
+
+        function closeRouteDetail(event) {
+            if (event && event.target !== document.getElementById('routeModal')) return;
+            document.getElementById('routeModal').classList.remove('show');
+        }
+
+        // ==================== 初始化 ====================
+        function init() {
+            updateMyBadges();
+            renderGroupList();
+            // 默认首页
+            switchTab('home');
+        }
+
+        // 关闭弹窗的全局处理
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMarkerPopup();
+                closeRouteDetail();
+                closeMyDetailModal();
+            }
+        });
+
+        // 初始化
+        init();
+
+        console.log('🏮 磁器口非遗文化小程序已就绪！');
+        console.log('  📍 首页 - 推荐打卡线路');
+        console.log('  🗺️ 地图 - 8个非遗点位可点击');
+        console.log('  👥 拼团 - 一键报名');
+        console.log('  👤 我的 - 打卡/拼团/收藏');
+        console.log('  💾 数据已接入localStorage持久化存储');
+    </script>
+</body>
+</html>
